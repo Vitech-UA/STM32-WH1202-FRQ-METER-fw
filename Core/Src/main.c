@@ -99,18 +99,30 @@ int main(void) {
 
 	set_lcd_brightness();
 
-    lcdInit(&lcdConfig);
+	lcdInit(&lcdConfig);
 	lcdClrScr();
-	lcdGoto(1, 1);
-	lcdPuts("MHz");
 
-
+	lcdGoto(1, 8);
+	lcdPuts("Hz");
 	/* USER CODE END 2 */
 
 	/* Infinite loop */
 	/* USER CODE BEGIN WHILE */
 
 	while (1) {
+		// Вивід частоти
+		lcdGoto(1, 0);
+		lcdItos(freq);
+		// Вивід поточного діапазону
+		lcdGoto(2, 0);
+		lcdPuts("10M");
+
+		lcdGoto(2, 4);
+		lcdPuts("20M");
+
+		lcdGoto(2, 8);
+		lcdPuts("40M");
+
 		/* USER CODE END WHILE */
 
 		/* USER CODE BEGIN 3 */
@@ -168,16 +180,6 @@ void set_lcd_brightness() {
 	HAL_GPIO_WritePin(LCD_BLK_GPIO_Port, LCD_BLK_Pin, GPIO_PIN_SET);
 }
 
-void imitationPrinting(char *ptr) {
-	lcdSetMode(VIEW_MODE_DispOn_BlkOff_CrsOn);
-
-	while (*ptr != 0) {
-		lcdPutc(*ptr++);
-		HAL_Delay(100);
-	}
-
-	lcdSetMode(VIEW_MODE_DispOn_BlkOff_CrsOff);
-}
 /* USER CODE END 4 */
 
 /**

@@ -97,13 +97,19 @@ int main(void) {
 	HAL_TIM_Base_Start(&htim2);
 	HAL_TIM_Base_Start(&htim3);
 
-	set_lcd_brightness();
+	//set_lcd_brightness();
 
 	lcdInit(&lcdConfig);
 	lcdClrScr();
 
 	lcdGoto(1, 8);
 	lcdPuts("Hz");
+
+	uint8_t freq_scaler = 1;
+	uint8_t LCD_BUFFER[12] = { };
+	char str_Hz[] = "Hz";
+	char str_MHz[] = "MHz";
+	char str_M[] = "M";
 	/* USER CODE END 2 */
 
 	/* Infinite loop */
@@ -111,17 +117,34 @@ int main(void) {
 
 	while (1) {
 		// Вивід частоти
+
+		sprintf(LCD_BUFFER, "%-9d %s", freq * freq_scaler, str_Hz);
 		lcdGoto(1, 0);
-		lcdItos(freq);
-		// Вивід поточного діапазону
-		lcdGoto(2, 0);
-		lcdPuts("10M");
+		lcdPuts(LCD_BUFFER);
 
-		lcdGoto(2, 4);
-		lcdPuts("20M");
+		if (HAL_GPIO_ReadPin(BAND_20M_GPIO_Port, BAND_20M_Pin)
+				&& HAL_GPIO_ReadPin(BAND_40M_GPIO_Port, BAND_40M_Pin)) {
+			freq_scaler = 1;
+			lcdGoto(2, 0);
+			sprintf(LCD_BUFFER, "%2d%s %-2d" "%s", 7, str_MHz, 40, str_M);
+			lcdPuts(LCD_BUFFER);
+		}
 
-		lcdGoto(2, 8);
-		lcdPuts("40M");
+		else if (!HAL_GPIO_ReadPin(BAND_20M_GPIO_Port, BAND_20M_Pin)) {
+			freq_scaler = 2;
+			lcdGoto(2, 0);
+			sprintf(LCD_BUFFER, "%2d%s %-2d" "%s", 14, str_MHz, 20, str_M);
+			lcdPuts(LCD_BUFFER);
+		} else if (!HAL_GPIO_ReadPin(BAND_40M_GPIO_Port, BAND_40M_Pin)) {
+			freq_scaler = 3;
+			lcdGoto(2, 0);
+			sprintf(LCD_BUFFER, "%2d%s %-2d" "%s", 21, str_MHz, 10, str_M);
+			lcdPuts(LCD_BUFFER);
+		} else {
+			freq_scaler = 31;
+			lcdGoto(2, 3);
+			lcdPuts("ERR");
+		}
 
 		/* USER CODE END WHILE */
 
@@ -178,6 +201,10 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 }
 void set_lcd_brightness() {
 	HAL_GPIO_WritePin(LCD_BLK_GPIO_Port, LCD_BLK_Pin, GPIO_PIN_SET);
+}
+
+void freq_correction(void){
+
 }
 
 /* USER CODE END 4 */

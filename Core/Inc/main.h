@@ -57,6 +57,10 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define BAND_20M_Pin GPIO_PIN_6
+#define BAND_20M_GPIO_Port GPIOA
+#define BAND_40M_Pin GPIO_PIN_7
+#define BAND_40M_GPIO_Port GPIOA
 #define LCD_BLK_Pin GPIO_PIN_12
 #define LCD_BLK_GPIO_Port GPIOB
 #define LCD_RS_Pin GPIO_PIN_3

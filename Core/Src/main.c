@@ -52,7 +52,7 @@ volatile uint32_t freq = 0;
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
 void set_lcd_brightness();
-
+void print_freq_format(int freq_value);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -97,13 +97,10 @@ int main(void) {
 	HAL_TIM_Base_Start(&htim2);
 	HAL_TIM_Base_Start(&htim3);
 
-	//set_lcd_brightness();
+	set_lcd_brightness();
 
 	lcdInit(&lcdConfig);
 	lcdClrScr();
-
-	lcdGoto(1, 8);
-	lcdPuts("Hz");
 
 	uint8_t freq_scaler = 1;
 	uint8_t LCD_BUFFER[12] = { };
@@ -118,9 +115,7 @@ int main(void) {
 	while (1) {
 		// Вивід частоти
 
-		sprintf(LCD_BUFFER, "%-9d %s", freq * freq_scaler, str_Hz);
-		lcdGoto(1, 0);
-		lcdPuts(LCD_BUFFER);
+		print_freq_format(freq * freq_scaler);
 
 		if (HAL_GPIO_ReadPin(BAND_20M_GPIO_Port, BAND_20M_Pin)
 				&& HAL_GPIO_ReadPin(BAND_40M_GPIO_Port, BAND_40M_Pin)) {
@@ -203,8 +198,18 @@ void set_lcd_brightness() {
 	HAL_GPIO_WritePin(LCD_BLK_GPIO_Port, LCD_BLK_Pin, GPIO_PIN_SET);
 }
 
-void freq_correction(void){
-
+void print_freq_format(int freq_value) {
+	int DIG1, DIG2, DIG3, DIG4, DIG5, DIG6;
+	char LCD_BUFFER[12];
+	DIG1 = freq_value % 100000000 / 10000000;
+	DIG2 = freq_value % 10000000 / 1000000;
+	DIG3 = freq_value % 1000000 / 100000;
+	DIG4 = freq_value % 100000 / 10000;
+	DIG5 = freq_value % 10000 / 1000;
+	DIG6 = freq_value % 1000 / 100;
+	sprintf(LCD_BUFFER, "%d%d.%d%d%d.%d00Hz", DIG1, DIG2, DIG3, DIG4, DIG5, DIG6);
+	lcdGoto(1, 0);
+	lcdPuts(LCD_BUFFER);
 }
 
 /* USER CODE END 4 */
